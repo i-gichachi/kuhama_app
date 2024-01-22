@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+flask-wtf = "*"
+flask-migrate = "*"
+flask-bcrypt = "*"
+flask-restful = "*"
+flask-cors = "*"
+flask-jwt-extended = "*"
+email-validator = "*"
+sqlalchemy-serializer = "*"
+requests = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
+honcho = "*"
+googlemaps = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
