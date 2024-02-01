@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { useNavigate, Link } from 'react-router-dom';
+import { UserContext } from './UserContext'; 
 
 const loginSchema = Yup.object().shape({
     login: Yup.string().required('Required'),
@@ -11,10 +12,11 @@ const loginSchema = Yup.object().shape({
 
 const Login = () => {
     const navigate = useNavigate();
+    const { setUser } = useContext(UserContext);
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
-            const response = await fetch('http://127.0.0.1:5555/login', {
+            const response = await fetch('/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,9 +28,12 @@ const Login = () => {
                 throw new Error('Network response was not ok');
             }
 
-            await response.json();
+            const data = await response.json();
+            localStorage.setItem('token', data.token); 
+            setUser({ id: data.id, username: data.username, user_type: data.user_type });
+
             window.alert('You have successfully logged into the system');
-            navigate('/'); // Redirect to the landing page
+            navigate(data.user_type === 'admin' ? '/admin-dashboard' : '/customer-dashboard'); 
         } catch (error) {
             if (error.message === 'Network response was not ok') {
                 setErrors({ server: 'Invalid username, email, phone number, or password' });
