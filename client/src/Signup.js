@@ -11,6 +11,7 @@ const SignupSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Required'),
     phone_number: Yup.string().matches(/^\d{9}$/, 'Phone number must be exactly 9 digits').required('Required'),
     gender: Yup.string().oneOf(['male', 'female'], 'Invalid gender').required('Required'),
+    location: Yup.string(),
     date_of_birth: Yup.date().required('Required').max(new Date(), 'You must be at least 18 years old to register.'),
     password: Yup.string().matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$/, 'Password should have at least one lowercase, one uppercase, one number, and one special character').required('Required'),
     confirm_password: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required'),
@@ -20,9 +21,23 @@ const SignupSchema = Yup.object().shape({
 const Signup = () => {
     const navigate = useNavigate();
 
+    const counties = [
+        "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo Marakwet",
+        "Embu", "Garissa", "Homa Bay", "Isiolo", "Kajiado",
+        "Kakamega", "Kericho", "Kiambu", "Kilifi", "Kirinyaga",
+        "Kisii", "Kisumu", "Kitui", "Kwale", "Laikipia",
+        "Lamu", "Machakos", "Makueni", "Mandera", "Marsabit",
+        "Meru", "Migori", "Mombasa", "Murang'a", "Nairobi City",
+        "Nakuru", "Nandi", "Narok", "Nyamira", "Nyandarua",
+        "Nyeri", "Samburu", "Siaya", "Taita Taveta", "Tana River",
+        "Tharaka Nithi", "Trans Nzoia", "Turkana", "Uasin Gishu",
+        "Vihiga", "Wajir", "West Pokot"
+    ];
+    
+
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
-            const response = await fetch('http://127.0.0.1:5555/signup', {
+            const response = await fetch('/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -57,6 +72,7 @@ const Signup = () => {
                     email: '',
                     phone_number: '',
                     gender: '',
+                    location: '',
                     date_of_birth: '',
                     password: '',
                     confirm_password: '',
@@ -99,6 +115,15 @@ const Signup = () => {
                         </Field>
                         <ErrorMessage name="gender" component="div" />
 
+                        <label htmlFor="location">Location</label>
+                        <Field name="location" as="select">
+                            <option value="">Select County</option>
+                            {counties.map(county => (
+                                <option key={county} value={county}>{county}</option>
+                            ))}
+                        </Field>
+                        <ErrorMessage name="location" component="div" />
+                        
                         <label htmlFor="date_of_birth">Date of Birth</label>
                         <Field name="date_of_birth" type="date" />
                         <ErrorMessage name="date_of_birth" component="div" />
