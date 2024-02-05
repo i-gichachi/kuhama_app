@@ -36,7 +36,7 @@ const MovingDetailsSchema = Yup.object().shape({
     to_lat: Yup.number().required('To latitude is required'),
     to_lon: Yup.number().required('To longitude is required'),
     home_size: Yup.string().oneOf(['bedsitter', 'one bedroom', 'studio', 'two bedroom'], 'Invalid home size').required('Home size is required'),
-    moving_date: Yup.date().min(new Date(), 'Moving date cannot be in the past').required('Moving date is required'),
+    moving_date: Yup.date().min(addDays(new Date(), 7), 'Moving date should be at least 7 days from today').required('Moving date is required'),
     packing_service: Yup.boolean(),
     additional_details: Yup.string()
 });
@@ -49,13 +49,20 @@ const PostMovingDetails = () => {
         if (user && user.user_type === 'customer') {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('/moving/add', {
+                const response = await fetch('/moving/add', { // Replace with your API endpoint
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(values),
+                    body: JSON.stringify({
+                        ...values,
+                        price: calculatePrice(
+                            calculateDistance(values.from_lat, values.from_lon, values.to_lat, values.to_lon), 
+                            values.home_size, 
+                            values.packing_service
+                        )
+                    }),
                 });
     
                 if (!response.ok) {
@@ -63,8 +70,8 @@ const PostMovingDetails = () => {
                 }
     
                 const data = await response.json();
-                alert(data.message); // Display success message from response
-                resetForm(); // Reset form after successful submission
+                alert(data.message); // Display success message from the server
+                resetForm(); // Reset the form after successful submission
             } catch (error) {
                 console.error('Error posting moving details:', error);
                 alert('Failed to post moving details'); // Display error message
@@ -74,7 +81,7 @@ const PostMovingDetails = () => {
         }
         setSubmitting(false);
     };
-    
+        
     return (
         <div>
             <h1>Post Moving Details</h1>
