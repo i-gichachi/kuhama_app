@@ -43,7 +43,7 @@ def calculate_price(distance, home_size, packing_service):
         "studio": 1.2,
         "two bedroom": 2
     }
-    packing_service_fee = 200 if packing_service else 0
+    packing_service_fee = 3000 if packing_service else 0
 
     price = distance * base_price_per_km * size_factor[home_size.lower()] + packing_service_fee
     return price
